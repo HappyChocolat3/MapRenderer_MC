@@ -10,7 +10,7 @@ export const S = {
   Outpost: 10, Ruined_Portal: 11, Ruined_Portal_N: 12, Ancient_City: 13,
   Treasure: 14, Mineshaft: 15, Desert_Well: 16, Geode: 17, Fortress: 18,
   Bastion: 19, End_City: 20, End_Gateway: 21, End_Island: 22,
-  Trail_Ruins: 23, Trial_Chambers: 24,
+  Trail_Ruins: 23, Trial_Chambers: 24, Abandoned_Camp: 25,
 };
 
 function wasiStubs(getMemory) {

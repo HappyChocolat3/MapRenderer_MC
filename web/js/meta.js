@@ -23,6 +23,7 @@ export const STRUCTURES = [
   { id: S.Ancient_City,    name: 'Starożytne miasto',      label: 'A',  color: '#0e4d5c', dims: [DIM.OVERWORLD] },
   { id: S.Trail_Ruins,     name: 'Ruiny szlaku',           label: 'Rs', color: '#b5745a', dims: [DIM.OVERWORLD] },
   { id: S.Trial_Chambers,  name: 'Komnaty prób',           label: 'K',  color: '#d4772a', dims: [DIM.OVERWORLD] },
+  { id: S.Abandoned_Camp,  name: 'Opuszczony obóz',        label: 'O',  color: '#c2185b', dims: [DIM.OVERWORLD] },
   { id: STRONGHOLD,        name: 'Twierdza',               label: 'T',  color: '#8c8c8c', dims: [DIM.OVERWORLD] },
   { id: SPAWN,             name: 'Spawn',                  label: '★',  color: '#ffffff', dims: [DIM.OVERWORLD], dark: true },
   { id: S.Mineshaft,       name: 'Kopalnia',               label: 'Ko', color: '#9c7038', dims: [DIM.OVERWORLD], dense: true },
@@ -73,9 +74,14 @@ export function mapVersionName(name, newest) {
   const m = /^(\d+)\.(\d+)(?:\.(\d+))?/.exec(name || '');
   if (!m) return newest;
   const major = +m[1], minor = +m[2], patch = +(m[3] || 0);
-  if (major !== 1) return newest; // year based versions (26.x+)
-  if (minor >= 22) return newest;
-  if (minor === 21) return patch <= 1 ? '1.21.1' : patch <= 3 ? '1.21.3' : newest;
+  if (major === 26) return minor <= 1 ? '1.21.9' : minor === 2 ? '26.2' : newest;
+  if (major !== 1 || minor >= 22) return newest;
+  if (minor === 21) {
+    if (patch <= 1) return '1.21.1';
+    if (patch <= 3) return '1.21.3';
+    if (patch === 4) return '1.21 WD';
+    return patch <= 8 ? '1.21.5' : '1.21.9';
+  }
   if (minor === 19) return patch <= 2 ? '1.19.2' : '1.19';
   if (minor === 16) return patch <= 1 ? '1.16.1' : '1.16';
   return '1.' + minor;

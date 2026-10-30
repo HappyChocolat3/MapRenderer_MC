@@ -34,9 +34,13 @@ enum MCVersion
     MC_1_20_6, MC_1_20 = MC_1_20_6,
     MC_1_21_1,
     MC_1_21_3,
-    MC_1_21_WD, // Winter Drop, version TBA
+    MC_1_21_WD, // Winter Drop (1.21.4)
+    MC_1_21_5,  // 1.21.5 - 1.21.8
+    MC_1_21_9,  // 1.21.9 - 26.1.2
+    MC_26_2,
+    MC_26_3,
     MC_1_21 = MC_1_21_WD,
-    MC_NEWEST = MC_1_21,
+    MC_NEWEST = MC_26_3,
 };
 
 enum Dimension
@@ -173,6 +177,10 @@ enum BiomeID
     cherry_grove                    = 185,
     // 1.21 Winter Drop
     pale_garden                     = 186,
+    // 26.2
+    sulfur_caves                    = 187,
+    // 26.3
+    dappled_forest                  = 188,
 };
 
 

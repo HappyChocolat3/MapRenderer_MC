@@ -76,6 +76,10 @@ const char* mc2str(int mc)
     case MC_1_21_1: return "1.21.1"; break;
     case MC_1_21_3: return "1.21.3"; break;
     case MC_1_21_WD: return "1.21 WD"; break;
+    case MC_1_21_5: return "1.21.5"; break;
+    case MC_1_21_9: return "1.21.9"; break;
+    case MC_26_2:   return "26.2"; break;
+    case MC_26_3:   return "26.3"; break;
     default:        return "?";
     }
 }
@@ -84,6 +88,10 @@ int str2mc(const char *s)
 {
     if (!strcmp(s, "1.21"))     return MC_1_21;
     if (!strcmp(s, "1.21 WD"))  return MC_1_21_WD;
+    if (!strcmp(s, "1.21.5"))   return MC_1_21_5;
+    if (!strcmp(s, "1.21.9"))   return MC_1_21_9;
+    if (!strcmp(s, "26.2"))     return MC_26_2;
+    if (!strcmp(s, "26.3"))     return MC_26_3;
     if (!strcmp(s, "1.21.3"))   return MC_1_21_3;
     if (!strcmp(s, "1.21.2"))   return MC_1_21_3; // backwards compatibility
     if (!strcmp(s, "1.21.1"))   return MC_1_21_1;
@@ -271,6 +279,10 @@ const char *biome2str(int mc, int id)
     case cherry_grove: return "cherry_grove";
     // 1.21.4 (Winter Drop)
     case pale_garden: return "pale_garden";
+    // 26.2
+    case sulfur_caves: return "sulfur_caves";
+    // 26.3
+    case dappled_forest: return "dappled_forest";
     }
     return NULL;
 }
@@ -298,6 +310,7 @@ const char* struct2str(int stype)
     case Ancient_City:      return "ancient_city";
     case Trail_Ruins:       return "trail_ruins";
     case Trial_Chambers:    return "trial_chambers";
+    case Abandoned_Camp:    return "abandoned_camp";
     case Fortress:          return "fortress";
     case Bastion:           return "bastion_remnant";
     case End_City:          return "end_city";
@@ -417,6 +430,8 @@ void initBiomeColors(unsigned char colors[256][3])
     setColor(colors, mangrove_swamp,                   0x2ccc8e); // -
     setColor(colors, cherry_grove,                     0xff91c8); // -
     setColor(colors, pale_garden,                      0x696d95); // -
+    setColor(colors, sulfur_caves,                     0xb3a83a); // -
+    setColor(colors, dappled_forest,                   0xa3b84a); // -
 }
 
 void initBiomeTypeColors(unsigned char colors[256][3])

@@ -14,6 +14,12 @@ int biomeExists(int mc, int id)
         if (id == pale_garden)
             return mc >= MC_1_21_WD;
 
+        if (id == sulfur_caves)
+            return mc >= MC_26_2;
+
+        if (id == dappled_forest)
+            return mc >= MC_26_3;
+
         if (id == cherry_grove)
             return mc >= MC_1_20;
 

@@ -85,6 +85,7 @@ int getStructureConfig(int structureType, int mc, StructureConfig *sconf)
     s_ancient_city          = { 20083232, 24, 16, Ancient_City,     0,0},
     s_trail_ruins           = { 83469867, 34, 26, Trail_Ruins,      0,0},
     s_trial_chambers        = { 94251327, 34, 22, Trial_Chambers,   0,0},
+    s_abandoned_camp        = { 91231127, 37, 29, Abandoned_Camp,   0,0},
     s_treasure              = { 10387320,  1,  1, Treasure,         0,0},
     s_mineshaft             = {        0,  1,  1, Mineshaft,        0,0},
     s_desert_well_115       = {    30010,  1,  1, Desert_Well,      0, 1.f/1000},
@@ -193,6 +194,9 @@ int getStructureConfig(int structureType, int mc, StructureConfig *sconf)
     case Trial_Chambers:
         *sconf = s_trial_chambers;
         return mc >= MC_1_21_1;
+    case Abandoned_Camp:
+        *sconf = s_abandoned_camp;
+        return mc >= MC_26_3;
     default:
         memset(sconf, 0, sizeof(StructureConfig));
         return 0;
@@ -236,6 +240,7 @@ int getStructurePos(int structureType, int mc, uint64_t seed, int regX, int regZ
     case Ancient_City:
     case Trail_Ruins:
     case Trial_Chambers:
+    case Abandoned_Camp:
         *pos = getFeaturePos(sconf, seed, regX, regZ);
         return 1;
 
@@ -825,7 +830,11 @@ int isStrongholdBiome(int mc, int id)
         return mc <= MC_1_15 || mc >= MC_1_18;
     case mangrove_swamp:
     case deep_dark:
+    case dappled_forest:
         return 0;
+    case cherry_grove:
+        // added to #stronghold_biased_to in 1.21.9
+        return mc >= MC_1_21_9;
     default:
         return 1;
     }
@@ -1282,7 +1291,34 @@ int isViableFeatureBiome(int mc, int structureType, int biomeID)
 
     case Mansion:
         if (mc <= MC_1_10) return 0;
+        if (biomeID == pale_garden) return mc >= MC_1_21_5;
         return biomeID == dark_forest || biomeID == dark_forest_hills;
+
+    case Abandoned_Camp:
+        if (mc < MC_26_3) return 0;
+        switch (biomeID) {
+        case bamboo_jungle:
+        case birch_forest:
+        case cherry_grove:
+        case dappled_forest:
+        case flower_forest:
+        case forest:
+        case meadow:
+        case old_growth_birch_forest:
+        case old_growth_pine_taiga:
+        case old_growth_spruce_taiga:
+        case pale_garden:
+        case savanna:
+        case snowy_taiga:
+        case sparse_jungle:
+        case swamp:
+        case taiga:
+        case windswept_forest:
+        case wooded_badlands:
+            return 1;
+        default:
+            return 0;
+        }
 
     case Fortress:
         return (biomeID == nether_wastes || biomeID == soul_sand_valley ||
@@ -1526,6 +1562,10 @@ int isViableStructurePos(int structureType, Generator *g, int x, int z, uint32_t
     {
     case Trail_Ruins:
         if (g->mc <= MC_1_19) goto L_not_viable;
+        goto L_feature;
+    case Abandoned_Camp:
+        // jigsaw structure, approximated by a surface biome check at the chunk
+        if (g->mc < MC_26_3) goto L_not_viable;
         goto L_feature;
     case Ocean_Ruin:
     case Shipwreck:
