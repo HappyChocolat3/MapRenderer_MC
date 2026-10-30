@@ -202,7 +202,7 @@ function scheduleTiles() {
     if (inflight.has(key)) continue;
     if (!requestTile(scale, t.tx, t.tz)) break;
   }
-  $('progress').textContent = pending ? `Generowanie… (${pending} ${pending === 1 ? 'kafelek' : 'kafelków'})` : '';
+  $('progress').textContent = pending ? `Generating… (${pending} ${pending === 1 ? 'tile' : 'tiles'})` : '';
 }
 
 function evictTiles() {
@@ -339,7 +339,7 @@ function draw() {
   if (state.layers.grid) drawGrid(b);
   drawMarkers(b, sources);
   updateStructZoomNotes();
-  $('scaleInfo').textContent = bpp >= 1 ? `1 px = ${+bpp.toFixed(2)} bl.` : `1 bl. = ${+(1 / bpp).toFixed(1)} px`;
+  $('scaleInfo').textContent = bpp >= 1 ? `1 px = ${+bpp.toFixed(2)} blocks` : `1 block = ${+(1 / bpp).toFixed(1)} px`;
 }
 
 function drawGrid(b) {
@@ -541,14 +541,14 @@ function updateSeedInfo() {
   const raw = $('seed').value.trim();
   const isNumber = /^[-+]?\d+$/.test(raw);
   $('seedInfo').textContent = raw && !isNumber
-    ? `Tekstowy seed → ${state.seed}`
+    ? `Text seed → ${state.seed}`
     : (!raw ? `Seed: ${state.seed}` : '');
 }
 
 function updateYControl() {
   const modern = state.mc >= cub.mcFromString('1.18');
   $('yLevel').disabled = !modern || state.dim !== DIM.OVERWORLD;
-  $('yHint').textContent = modern ? '(320 = powierzchnia)' : '(tylko 1.18+)';
+  $('yHint').textContent = modern ? '(320 = surface)' : '(1.18+ only)';
 }
 
 // ---------------------------------------------------------------------------
@@ -557,7 +557,7 @@ function updateYControl() {
 
 function buildVersionSelect() {
   const labels = {
-    '26.3': '26.3 (najnowsza)',
+    '26.3': '26.3 (latest)',
     '26.2': '26.2',
     '1.21.9': '1.21.9 – 26.1.2',
     '1.21.5': '1.21.5 – 1.21.8',
@@ -574,7 +574,7 @@ function buildVersionSelect() {
     const name = cub.mcName(mc);
     if (!name || name === '?' || cub.mcFromString(name) !== mc) continue;
     const old = mc < cub.mcFromString('1.7');
-    versions.push({ mc, name, label: (labels[name] || name) + (old ? ' (eksperymentalne)' : '') });
+    versions.push({ mc, name, label: (labels[name] || name) + (old ? ' (experimental)' : '') });
   }
   const sel = $('version');
   sel.innerHTML = '';
@@ -618,7 +618,7 @@ function buildStructList() {
     });
     const note = document.createElement('span');
     note.className = 'zoom-note';
-    if (!available) note.textContent = 'brak w tej wersji';
+    if (!available) note.textContent = 'not in this version';
     label.append(cb, swatch(def), document.createTextNode(def.name), note);
     li.appendChild(label);
     ul.appendChild(li);
@@ -629,7 +629,7 @@ function updateStructZoomNotes() {
   for (const li of $('structList').children) {
     const def = STRUCT_BY_ID.get(+li.dataset.id);
     if (!def || def.id >= 100 || !structConfigs.has(def.id)) continue;
-    li.querySelector('.zoom-note').textContent = typeVisibleAtZoom(def) ? '' : 'przybliż';
+    li.querySelector('.zoom-note').textContent = typeVisibleAtZoom(def) ? '' : 'zoom in';
   }
 }
 
@@ -774,14 +774,14 @@ async function loadLevelDat(file) {
     state.large = lvl.largeBiomes;
     $('largeBiomes').checked = lvl.largeBiomes;
     const parts = [];
-    if (lvl.levelName) parts.push(`„${lvl.levelName}”`);
-    parts.push(lvl.versionName ? `wersja ${lvl.versionName}` : 'wersja nieznana (przyjęto najnowszą)');
-    if (lvl.largeBiomes) parts.push('duże biomy');
-    info.textContent = 'Wczytano: ' + parts.join(', ');
+    if (lvl.levelName) parts.push(`"${lvl.levelName}"`);
+    parts.push(lvl.versionName ? `version ${lvl.versionName}` : 'unknown version (assuming latest)');
+    if (lvl.largeBiomes) parts.push('large biomes');
+    info.textContent = 'Loaded: ' + parts.join(', ');
     worldChanged();
   } catch (e) {
     console.error(e);
-    info.textContent = 'Błąd: ' + e.message;
+    info.textContent = 'Error: ' + e.message;
     info.classList.add('error');
   }
 }
@@ -853,7 +853,7 @@ function updateHover(px, py) {
     tip.innerHTML = '';
     const title = document.createElement('b');
     title.textContent = m.def.name;
-    tip.append(title, document.createTextNode(`\nX: ${m.x}  Z: ${m.z}\nKliknij, aby skopiować /tp`));
+    tip.append(title, document.createTextNode(`\nX: ${m.x}  Z: ${m.z}\nClick to copy /tp`));
     tip.style.left = px + 'px';
     tip.style.top = py + 'px';
     tip.hidden = false;
@@ -914,7 +914,7 @@ function bindMap() {
         if (m) {
           const cmd = `/tp @s ${m.x} ~ ${m.z}`;
           navigator.clipboard?.writeText(cmd).then(
-            () => showToast(`Skopiowano: ${cmd}`),
+            () => showToast(`Copied: ${cmd}`),
             () => showToast(cmd),
           );
         }
@@ -990,7 +990,7 @@ function loadHash() {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  $('progress').textContent = 'Ładowanie generatora…';
+  $('progress').textContent = 'Loading generator…';
   const wasmUrl = new URL('../cubiomes.wasm', import.meta.url);
   let module;
   try {
@@ -1014,5 +1014,5 @@ async function main() {
 
 main().catch((e) => {
   console.error(e);
-  $('progress').textContent = 'Błąd ładowania: ' + e.message;
+  $('progress').textContent = 'Failed to load: ' + e.message;
 });

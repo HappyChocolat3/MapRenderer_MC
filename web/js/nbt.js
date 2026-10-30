@@ -54,13 +54,13 @@ class Reader {
       }
       case 11: { const n = this.i32(), a = []; for (let i = 0; i < n; i++) a.push(this.i32()); return a; }
       case 12: { const n = this.i32(), a = []; for (let i = 0; i < n; i++) a.push(this.i64()); return a; }
-      default: throw new Error('Nieznany typ tagu NBT: ' + type);
+      default: throw new Error('Unknown NBT tag type: ' + type);
     }
   }
 
   root() {
     const t = this.u8();
-    if (t !== 10) throw new Error('Plik nie zaczyna się od tagu Compound');
+    if (t !== 10) throw new Error('File does not start with a Compound tag');
     this.str();
     return this.payload(10);
   }
@@ -77,7 +77,7 @@ export async function parseNBT(bytes) {
  */
 export async function readLevelDat(bytes) {
   if (bytes.length > 8 && !isGzip(bytes) && bytes[0] !== 10) {
-    throw new Error('To wygląda na level.dat z Bedrock Edition – obsługiwana jest tylko Java Edition.');
+    throw new Error('This looks like a Bedrock Edition level.dat – only Java Edition is supported.');
   }
   const root = await parseNBT(bytes);
   const data = root.Data || root;
@@ -86,7 +86,7 @@ export async function readLevelDat(bytes) {
   let seed = null;
   if (wgs && typeof wgs.seed === 'bigint') seed = wgs.seed;
   else if (typeof data.RandomSeed === 'bigint') seed = data.RandomSeed;
-  if (seed === null) throw new Error('Nie znaleziono seeda w pliku level.dat');
+  if (seed === null) throw new Error('No seed found in level.dat');
 
   let largeBiomes = false;
   const ow = wgs && wgs.dimensions && wgs.dimensions['minecraft:overworld'];
