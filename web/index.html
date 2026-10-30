@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa świata Minecraft</title>
+  <meta name="description" content="Mapa biomów, struktur, rzek i slime chunków dla seeda lub pliku level.dat (Minecraft Java Edition).">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <header class="brand">
+      <h1>Mapa świata MC</h1>
+      <button id="closeSidebar" class="icon-btn mobile-only" title="Zamknij panel" aria-label="Zamknij panel">✕</button>
+    </header>
+
+    <section>
+      <h2>Świat</h2>
+      <label class="field">
+        <span>Seed</span>
+        <div class="row">
+          <input id="seed" type="text" placeholder="np. 123456789 lub tekst" autocomplete="off" spellcheck="false">
+          <button id="randomSeed" class="icon-btn" title="Losowy seed" aria-label="Losowy seed">🎲</button>
+        </div>
+      </label>
+      <div id="seedInfo" class="hint"></div>
+
+      <label class="file-drop" id="levelDrop">
+        <input id="levelDat" type="file" accept=".dat,.dat_old,application/octet-stream">
+        <span>📂 Wczytaj <b>level.dat</b> (lub upuść plik tutaj)</span>
+      </label>
+      <div id="levelInfo" class="hint"></div>
+
+      <label class="field">
+        <span>Wersja (Java Edition)</span>
+        <select id="version"></select>
+      </label>
+      <label class="check"><input id="largeBiomes" type="checkbox"> Duże biomy</label>
+
+      <div class="field">
+        <span>Wymiar</span>
+        <div class="segmented" id="dimension">
+          <button data-dim="0" class="active">Overworld</button>
+          <button data-dim="-1">Nether</button>
+          <button data-dim="1">End</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Wysokość Y dla biomów <small id="yHint">(320 = powierzchnia)</small></span>
+        <div class="row">
+          <input id="yLevel" type="range" min="-64" max="320" step="4" value="320">
+          <output id="yValue">320</output>
+        </div>
+      </label>
+    </section>
+
+    <section>
+      <h2>Warstwy</h2>
+      <label class="check"><input id="layerBoundaries" type="checkbox" checked> Granice biomów</label>
+      <label class="check"><input id="layerRivers" type="checkbox" checked> Wyróżnij rzeki</label>
+      <label class="check"><input id="layerSlime" type="checkbox"> Slime chunki <small>(przy przybliżeniu)</small></label>
+      <label class="check"><input id="layerGrid" type="checkbox"> Siatka i współrzędne</label>
+      <label class="check"><input id="layerMuted" type="checkbox"> Stonowane kolory biomów</label>
+    </section>
+
+    <section>
+      <h2 class="with-actions">Struktury
+        <span class="actions">
+          <button id="structAll" class="link-btn">wszystkie</button>
+          <button id="structNone" class="link-btn">żadne</button>
+        </span>
+      </h2>
+      <ul id="structList" class="struct-list"></ul>
+      <p class="hint">Gęste struktury (kopalnie, skarby…) pojawiają się dopiero po przybliżeniu. Kliknij znacznik, aby skopiować komendę <code>/tp</code>.</p>
+    </section>
+
+    <section>
+      <details id="biomeLegend">
+        <summary><h2>Biomy</h2></summary>
+        <p class="hint">Kliknij biom, aby go podświetlić na mapie.</p>
+        <ul id="biomeList" class="biome-list"></ul>
+      </details>
+    </section>
+
+    <footer class="credits">
+      Generowanie świata: <a href="https://github.com/Cubitect/cubiomes" target="_blank" rel="noopener">cubiomes</a> (WebAssembly).
+      Niezależny projekt, niezwiązany z Mojang/Microsoft.
+    </footer>
+  </aside>
+
+  <main id="mapWrap">
+    <canvas id="map"></canvas>
+    <button id="openSidebar" class="icon-btn floating mobile-only" title="Ustawienia" aria-label="Ustawienia">☰</button>
+
+    <div id="tooltip" hidden></div>
+
+    <div class="toolbar">
+      <form id="gotoForm" class="goto">
+        <input id="gotoX" type="number" placeholder="X" step="1">
+        <input id="gotoZ" type="number" placeholder="Z" step="1">
+        <button type="submit" title="Przejdź do współrzędnych">Idź</button>
+      </form>
+      <div class="zoom">
+        <button id="zoomIn" title="Przybliż" aria-label="Przybliż">+</button>
+        <button id="zoomOut" title="Oddal" aria-label="Oddal">−</button>
+        <button id="zoomHome" title="Wróć do 0, 0" aria-label="Wróć do środka">⌂</button>
+      </div>
+    </div>
+
+    <div id="statusBar">
+      <span id="cursorInfo">—</span>
+      <span id="scaleInfo"></span>
+      <span id="progress"></span>
+    </div>
+    <div id="toast" hidden></div>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
