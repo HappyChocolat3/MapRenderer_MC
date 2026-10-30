@@ -1,0 +1,64 @@
+name: Dump biome parameters
+
+# Runs the official Minecraft data generator ("--reports") for a list of game
+# versions and commits the overworld/nether biome parameter lists to
+# tools/biome-params/. tools/gen_btree.py turns them into cubiomes tables.
+
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: Space separated game versions
+        required: false
+  push:
+    paths:
+      - .github/workflows/biome-params.yml
+
+permissions:
+  contents: write
+
+jobs:
+  dump:
+    runs-on: ubuntu-24.04
+    env:
+      VERSIONS: ${{ inputs.versions || '1.21.4 1.21.5 1.21.6 1.21.7 1.21.8 1.21.9 1.21.10 1.21.11 26.1 26.1.1 26.1.2 26.2 26.3' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Run data generator
+        run: |
+          set -euo pipefail
+          mkdir -p tools/biome-params work
+          curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json -o work/manifest.json
+          for v in $VERSIONS; do
+            echo "::group::$v"
+            meta=$(jq -r --arg v "$v" '.versions[] | select(.id == $v) | .url' work/manifest.json)
+            if [ -z "$meta" ]; then echo "unknown version $v"; echo "::endgroup::"; continue; fi
+            server=$(curl -fsSL "$meta" | jq -r '.downloads.server.url')
+            rm -rf work/gen && mkdir -p work/gen
+            curl -fsSL "$server" -o work/gen/server.jar
+            (cd work/gen && java -DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports --output out > log.txt 2>&1) || { tail -50 work/gen/log.txt; exit 1; }
+            for dim in overworld nether; do
+              f=work/gen/out/reports/biome_parameters/minecraft/$dim.json
+              if [ -f "$f" ]; then
+                jq -c . "$f" | gzip -9n > "tools/biome-params/$v-$dim.json.gz"
+              else
+                echo "missing $f"; find work/gen/out/reports -maxdepth 3 | head -50
+              fi
+            done
+            echo "::endgroup::"
+          done
+          (cd tools/biome-params && sha256sum *.json.gz | tee SHA256SUMS)
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/biome-params
+          git commit -m "Add biome parameter reports from the Minecraft data generator" || exit 0
+          git push
