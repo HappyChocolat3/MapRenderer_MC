@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minecraft World Map</title>
+  <meta name="description" content="Biomes, structures, rivers and slime chunks for a seed or level.dat file (Minecraft Java Edition).">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <aside id="sidebar">
+    <header class="brand">
+      <h1>MC World Map</h1>
+      <button id="closeSidebar" class="icon-btn mobile-only" title="Close panel" aria-label="Close panel">✕</button>
+    </header>
+
+    <section>
+      <h2>World</h2>
+      <label class="field">
+        <span>Seed</span>
+        <div class="row">
+          <input id="seed" type="text" placeholder="e.g. 123456789 or text" autocomplete="off" spellcheck="false">
+          <button id="randomSeed" class="icon-btn" title="Random seed" aria-label="Random seed">🎲</button>
+        </div>
+      </label>
+      <div id="seedInfo" class="hint"></div>
+
+      <label class="file-drop" id="levelDrop">
+        <input id="levelDat" type="file" accept=".dat,.dat_old,application/octet-stream">
+        <span>📂 Load <b>level.dat</b> (or drop the file here)</span>
+      </label>
+      <div id="levelInfo" class="hint"></div>
+
+      <label class="field">
+        <span>Version (Java Edition)</span>
+        <select id="version"></select>
+      </label>
+      <label class="check"><input id="largeBiomes" type="checkbox"> Large biomes</label>
+
+      <div class="field">
+        <span>Dimension</span>
+        <div class="segmented" id="dimension">
+          <button data-dim="0" class="active">Overworld</button>
+          <button data-dim="-1">Nether</button>
+          <button data-dim="1">End</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span>Biome Y level <small id="yHint">(320 = surface)</small></span>
+        <div class="row">
+          <input id="yLevel" type="range" min="-64" max="320" step="4" value="320">
+          <output id="yValue">320</output>
+        </div>
+      </label>
+    </section>
+
+    <section>
+      <h2>Layers</h2>
+      <label class="check"><input id="layerBoundaries" type="checkbox" checked> Biome boundaries</label>
+      <label class="check"><input id="layerRivers" type="checkbox" checked> Highlight rivers</label>
+      <label class="check"><input id="layerSlime" type="checkbox"> Slime chunks <small>(when zoomed in)</small></label>
+      <label class="check"><input id="layerGrid" type="checkbox"> Grid and coordinates</label>
+      <label class="check"><input id="layerMuted" type="checkbox"> Muted biome colors</label>
+    </section>
+
+    <section>
+      <h2 class="with-actions">Structures
+        <span class="actions">
+          <button id="structAll" class="link-btn">all</button>
+          <button id="structNone" class="link-btn">none</button>
+        </span>
+      </h2>
+      <ul id="structList" class="struct-list"></ul>
+      <p class="hint">Dense structures (mineshafts, treasure…) only appear when zoomed in. Click a marker to copy a <code>/tp</code> command.</p>
+    </section>
+
+    <section>
+      <details id="biomeLegend">
+        <summary><h2>Biomes</h2></summary>
+        <p class="hint">Click a biome to highlight it on the map.</p>
+        <ul id="biomeList" class="biome-list"></ul>
+      </details>
+    </section>
+
+    <footer class="credits">
+      World generation: <a href="https://github.com/Cubitect/cubiomes" target="_blank" rel="noopener">cubiomes</a> (WebAssembly).
+      Not affiliated with Mojang or Microsoft.
+    </footer>
+  </aside>
+
+  <main id="mapWrap">
+    <canvas id="map"></canvas>
+    <button id="openSidebar" class="icon-btn floating mobile-only" title="Settings" aria-label="Settings">☰</button>
+
+    <div id="tooltip" hidden></div>
+
+    <div class="toolbar">
+      <form id="gotoForm" class="goto">
+        <input id="gotoX" type="number" placeholder="X" step="1">
+        <input id="gotoZ" type="number" placeholder="Z" step="1">
+        <button type="submit" title="Go to coordinates">Go</button>
+      </form>
+      <div class="zoom">
+        <button id="zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+        <button id="zoomOut" title="Zoom out" aria-label="Zoom out">−</button>
+        <button id="zoomHome" title="Back to 0, 0" aria-label="Back to center">⌂</button>
+      </div>
+    </div>
+
+    <div id="statusBar">
+      <span id="cursorInfo">—</span>
+      <span id="scaleInfo"></span>
+      <span id="progress"></span>
+    </div>
+    <div id="toast" hidden></div>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
