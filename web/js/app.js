@@ -4,6 +4,7 @@ import {
   parseSeed, randomSeed, mapVersionName,
 } from './meta.js';
 import { readLevelDat } from './nbt.js';
+import { iconCanvas, ICON_SIZE } from './icons.js';
 
 const TILE = 256;                  // samples per tile side
 const LEVELS = [1, 4, 16, 64, 256]; // cubiomes generation scales
@@ -380,6 +381,23 @@ function typeVisibleAtZoom(def) {
 }
 
 function drawMarker(def, px, py, size) {
+  const icon = iconCanvas(def.id);
+  if (icon) {
+    // light tile with a border in the structure's colour and a pixel-art icon
+    const x = Math.round(px - size / 2), y = Math.round(py - size / 2);
+    ctx.fillStyle = '#ece6d6';
+    ctx.strokeStyle = def.color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(x, y, size, size, 4);
+    ctx.fill();
+    ctx.stroke();
+    const s = size >= 26 ? ICON_SIZE * 2 : ICON_SIZE * 1.5;
+    const o = Math.round((size - s) / 2);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(icon, x + o, y + o, s, s);
+    return size;
+  }
   ctx.font = `700 ${size <= 14 ? 9 : 10}px system-ui, sans-serif`;
   const w = Math.max(size, ctx.measureText(def.label).width + 6);
   const x = Math.round(px - w / 2), y = Math.round(py - size / 2);
@@ -427,7 +445,7 @@ function drawMarkers(b, sources) {
 
   // Types whose structures are packed tightly at this zoom are drawn as small
   // dots, so that the labelled badges stay readable.
-  const size = bpp > 32 ? 14 : 18;
+  const size = bpp > 32 ? 22 : 28;
   const dots = [], badges = [];
   for (const item of list) {
     (regionBlocks(item[0].id) / bpp < BADGE_MIN_SPACING ? dots : badges).push(item);
@@ -590,6 +608,16 @@ function newestVersion() { return versions[versions.length - 1]; }
 
 function swatch(def) {
   const span = document.createElement('span');
+  const icon = iconCanvas(def.id);
+  if (icon) {
+    span.className = 'marker-icon';
+    span.style.borderColor = def.color;
+    const img = document.createElement('img');
+    img.src = icon.toDataURL();
+    img.alt = '';
+    span.appendChild(img);
+    return span;
+  }
   span.className = 'marker-swatch' + (def.dark ? ' dark' : '');
   span.style.background = def.color;
   span.textContent = def.label;

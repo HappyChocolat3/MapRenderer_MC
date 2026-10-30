@@ -158,6 +158,19 @@ code { background: var(--panel-2); padding: 0 4px; border-radius: 3px; }
 }
 .marker-swatch.dark { color: #111; }
 
+.marker-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 2px solid;
+  border-radius: 5px;
+  background: #ece6d6;
+}
+.marker-icon img { width: 24px; height: 24px; image-rendering: pixelated; }
+
 details summary { cursor: pointer; list-style: none; }
 details summary::-webkit-details-marker { display: none; }
 details summary h2 { display: inline; }
