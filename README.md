@@ -96,6 +96,13 @@ table (`python3 tools/gen_btree.py tools/biome-params/X-overworld.json.gz NAME`)
 add the version to `cubiomes/biomes.h`, `biomenoise.c` and `util.c`, plus any new
 biomes or structures.
 
+A weekly workflow (**"Check for new Minecraft version"**) checks for new
+releases. When one is out, it runs the data generator for it and for the last
+supported version (`tools/supported-version.txt`), compares biomes and
+structures, and opens an issue saying whether the map needs an update. It does
+not change anything by itself. After adding a version, update
+`tools/supported-version.txt`.
+
 Abandoned camps are jigsaw structures — as cubiomes does for other structures of
 this kind, their biome check is an approximation (at the surface of the start
 chunk).
