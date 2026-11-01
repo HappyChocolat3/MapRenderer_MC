@@ -96,6 +96,13 @@ table (`python3 tools/gen_btree.py tools/biome-params/X-overworld.json.gz NAME`)
 add the version to `cubiomes/biomes.h`, `biomenoise.c` and `util.c`, plus any new
 biomes or structures.
 
+A weekly workflow (**"Check for new Minecraft version"**) checks for new
+releases. When one is out, it runs the data generator for it and for the last
+supported version (`tools/supported-version.txt`), compares biomes and
+structures, and opens an issue saying whether the map needs an update. It does
+not change anything by itself. After adding a version, update
+`tools/supported-version.txt`.
+
 Abandoned camps are jigsaw structures — as cubiomes does for other structures of
 this kind, their biome check is an approximation (at the surface of the start
 chunk).
@@ -107,6 +114,18 @@ chunk).
   supports it), but in rare cases a structure may still fail to generate in game.
 - This project is not affiliated with Mojang Studios or Microsoft.
 
-## Licenses
+## License
 
-- cubiomes — MIT, © Cubitect (`cubiomes/LICENSE`).
+Copyright © 2026 HappyChocolat3
+
+This project is free software: you can redistribute it and/or modify it under
+the terms of the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)).
+If you distribute a modified version — this includes publishing it as a website,
+since the code runs in the visitor's browser — you must make its source code
+available under the same license and keep the copyright and author notices.
+
+Third-party code:
+
+- [cubiomes](https://github.com/Cubitect/cubiomes) — MIT, © Cubitect
+  (`cubiomes/LICENSE`). The modifications to it in this repository are
+  licensed under the GPL-3.0 together with the rest of the project.

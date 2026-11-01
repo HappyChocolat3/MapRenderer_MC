@@ -192,6 +192,7 @@ details[open] summary::before { content: "▾ "; }
 
 .credits { color: var(--muted); font-size: 11px; border-top: 1px solid var(--border); padding-top: 12px; }
 .credits a { color: var(--accent); }
+.credits .author { margin: 0 0 6px; color: var(--text); }
 
 /* ---------- map ---------- */
 

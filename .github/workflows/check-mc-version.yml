@@ -1,0 +1,84 @@
+name: Check for new Minecraft version
+
+# Once a week: if a new Minecraft release is out, compare its world generation
+# data with the last supported version (tools/supported-version.txt) and open
+# an issue with the result. Nothing in the repository is changed.
+
+on:
+  schedule:
+    - cron: '23 4 * * 1' # Mondays 04:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Find latest release
+        id: version
+        run: |
+          set -euo pipefail
+          curl -fsSL https://piston-meta.mojang.com/mc/game/version_manifest_v2.json -o manifest.json
+          latest=$(jq -r '.latest.release' manifest.json)
+          supported=$(tr -d '[:space:]' < tools/supported-version.txt)
+          title="Minecraft $latest released"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "supported=$supported" >> "$GITHUB_OUTPUT"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+          if [ "$latest" = "$supported" ]; then
+            echo "Up to date ($supported)."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          elif gh issue list --state all --search "\"$title\" in:title" --json title \
+               | jq -e --arg t "$title" 'any(.[]; .title == $t)' > /dev/null; then
+            echo "Issue for $latest already exists."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "New release: $latest (supported: $supported)"
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - uses: actions/setup-java@v4
+        if: steps.version.outputs.new == 'true'
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Run data generator for both versions
+        if: steps.version.outputs.new == 'true'
+        run: |
+          set -euo pipefail
+          for v in "${{ steps.version.outputs.supported }}" "${{ steps.version.outputs.latest }}"; do
+            meta=$(jq -r --arg v "$v" '.versions[] | select(.id == $v) | .url' manifest.json)
+            server=$(curl -fsSL "$meta" | jq -r '.downloads.server.url')
+            mkdir -p "gen/$v"
+            curl -fsSL "$server" -o "gen/$v/server.jar"
+            (cd "gen/$v" && java -DbundlerMainClass=net.minecraft.data.Main -jar server.jar \
+              --reports --server --output out > log.txt 2>&1) || { tail -50 "gen/$v/log.txt"; exit 1; }
+          done
+
+      - name: Open issue
+        if: steps.version.outputs.new == 'true'
+        run: |
+          set -euo pipefail
+          old="${{ steps.version.outputs.supported }}"
+          new="${{ steps.version.outputs.latest }}"
+          date=$(jq -r --arg v "$new" '.versions[] | select(.id == $v) | .releaseTime[:10]' manifest.json)
+          {
+            echo "Minecraft **$new** was released on $date."
+            echo
+            python3 tools/compare_worldgen.py "gen/$old/out" "gen/$new/out" "$old" "$new"
+            echo
+            echo "---"
+            echo "Opened automatically by the \"Check for new Minecraft version\" workflow."
+          } > body.md
+          cat body.md
+          gh issue create --title "${{ steps.version.outputs.title }}" --body-file body.md
+        env:
+          GH_TOKEN: ${{ github.token }}
