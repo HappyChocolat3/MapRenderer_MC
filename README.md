@@ -1,4 +1,10 @@
-# Minecraft World Map
+# Minecraft World Map 🗺️
+
+## 👉 [Open the map: happychocolat3.github.io/MapRenderer_MC](https://happychocolat3.github.io/MapRenderer_MC/)
+
+Runs in the browser (desktop, tablet, phone) – no installation, no login.
+
+[![Map preview](web/preview.png)](https://happychocolat3.github.io/MapRenderer_MC/)
 
 A Minecraft (Java Edition) world map that runs entirely in the browser — perfect
 for hosting on GitHub Pages. From a **seed** or a **`level.dat`** file it shows:
